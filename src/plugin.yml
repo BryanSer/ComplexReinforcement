@@ -1,0 +1,57 @@
+# 购买者条约:
+# 作者: Brayn_lzh
+# QQ: 390807154
+# 保修规则:
+#   插件永久修复错误(在合理程度内 非买方误操作 非服务端本身问题)
+#   包1年内MC版本更替修复
+#   对修改过代码的不保修
+#   需要保修时请说明问题 务必附上报错内容
+#   若需要添加新功能将进行最低量的收费
+# 你可以:
+#   1.声明这个插件是私用的
+#   2.举报他人服务器剽窃该插件
+#   3.利用本插件盈利
+#   4.修改本插件代码
+# 你不可以:
+#   1.声明这个插件是你写的
+#   2.不能通过卖本插件盈利
+# 有可能在不通知您的情况下对本插件进行修改后卖给他人(一般都会通知 并且将返回部分钱)
+# 对应不在本条约里的事项请向我联系
+name: ComplexReinforcement
+authors: ['Bryan_lzh']
+main: Br.ComplexReinforcement.Main
+description: '开发者QQ:390807154'
+softdepend: [BrAPI]
+version: 1.0
+
+commands:
+    ComplexReinforcementEquipment:
+        aliases: [cre]
+        description: 主命令
+        usage: |
+           以下功能均未实现
+           §6/<command> get [name} >> 获得一个套装的全部物品
+           §6/<command> give [name] [player] (0~3) >> 给予一个玩家一个套装的某个或全部物品
+           §6/<command> create [name] >> 创建一个新的套装
+           §6/<command> set [name] [id] >> 设置手上的物品到套装的某个位置上
+           §b       ID: 0:头 1:胸 2:腿 3:鞋
+           §6/<command> effect [name] [level] [skill/attr] [参数] >> 添加一个在对应level可触发的效果
+           §b       level 指身上的该套装的装备数量范围:[1,4]
+           §b       skill/attr 表示技能或者属性
+           §b       参数 填写方式和写在Lore上的时候一样 用_替代空格
+           §a§l例子:
+           §a   /<command> create test      !创建一个名为test的套装
+           §a   /<command> set test 0       !分别设置四个部位物品
+           §a   /<command> set test 1
+           §a   /<command> set test 2
+           §a   /<command> set test 3
+           §a   /<command> effect test 1 skill Shild(CD:20_护盾量:20)   !在至少装备一件物品的时候获得护盾技能
+           §a   /<command> effect test 1 attr ATK:_+20                  !在至少装备一件物品的时候获得攻击力+20
+           §a   /<command> effect test 4 attr DEF:_+100                 !在四件全装备的情况下获得防御力+100
+    ComplexReinforcement:
+        aliases: [cr]
+        description: 主命令
+        usage: |
+           §6/<command> list attr   >> 显示属性列表
+           §6/<command> list skill  >> 显示技能列表
+           §6/<command> info [skill/attr] [name] >> 显示一个属性或者技能的详细说明
