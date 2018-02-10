@@ -53,10 +53,14 @@ public class BaseAttribute<V extends Number> extends Attribute<V> {
 
     private static <N extends Number> N add(N n, String s) {
         if (n == null) {
+            boolean div = false;
+            if (s.contains("%")) {
+                div = true;
+            }
             if (s.matches("(.?)+[^0-9.]")) {
                 s = s.replaceAll("[^0-9.]", "");
             }
-            Double d = Double.parseDouble(s);
+            Double d = Double.parseDouble(s) / (div ? 100d : 1);
             return (N) d;
         }
         if (n instanceof Integer) {
@@ -65,14 +69,16 @@ public class BaseAttribute<V extends Number> extends Attribute<V> {
             return (N) i;
         }
         if (s.matches("(.?)+[^0-9.]")) {
+            boolean div = false;
+            if (s.contains("%")) {
+                div = true;
+            }
             s = s.replaceAll("[^0-9.]", "");
-            Double d = n.doubleValue() + Double.parseDouble(s);
-            d /= 100;
+            Double d = n.doubleValue() + Double.parseDouble(s) / 100d;
             return (N) d;
         }
         Double d = n.doubleValue() + Double.parseDouble(s);
         return (N) d;
     }
-
 
 }

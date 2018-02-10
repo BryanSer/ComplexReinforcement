@@ -141,6 +141,7 @@ public class SkillManager implements Listener {
         Map<String, Skill<?, E>> map = st.getSkills();
         Outter:
         for (String s : is.getItemMeta().getLore()) {
+            s = s.replaceAll("§(.)", "");
             if (s.contains("（")) {
                 s = s.replaceAll("（", "(").replaceAll("）", ")");
             }

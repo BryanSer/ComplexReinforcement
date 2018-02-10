@@ -29,8 +29,10 @@ public class Effect implements BrConfigurationSerializable {
     private Map<String, Attribute.Value<? extends Number>> Bases;
     private Map<String, List<Attribute.Value>> Advanceds;
     private List<String> Skills;
-    
-    
+
+    public Effect() {
+        RawEffects = new ArrayList<>();
+    }
 
     public Effect(Map<String, Object> args) {
         BrConfigurationSerializable.deserialize(args, this);
@@ -90,12 +92,6 @@ public class Effect implements BrConfigurationSerializable {
         }
     }
 
-    public void doWithRawEffects(Consumer<List<String>> c) {
-        c.accept(this.RawEffects);
-        this.Analyze();
-    }
-
-    @Deprecated
     public List<String> getRawEffects() {
         return RawEffects;
     }
@@ -151,6 +147,5 @@ public class Effect implements BrConfigurationSerializable {
         }
         return Objects.equals(this.Skills, other.Skills);
     }
-    
-    
+
 }

@@ -11,7 +11,6 @@ import Br.ComplexReinforcement.Logs;
 import Br.ComplexReinforcement.Main;
 import Br.ComplexReinforcement.Skills.RuntimeEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +49,10 @@ public class AttributesManager implements Listener {
     public static void init() {
         Bukkit.getPluginManager().registerEvents(new AttributesManager(), Main.Plugin);
         Logs.Log("AttributesManager >> 初始化 >> 完成");
+    }
+
+    public static Collection<String> getKeys() {
+        return Attributes.keySet();
     }
 
     public static void RegisterAttribute(Attribute<?> attr, int ep) {
@@ -171,6 +174,7 @@ public class AttributesManager implements Listener {
                 Bukkit.getPluginManager().callEvent(EODE);
             }
         }
+
     }
 
     public static Map<String, Long> CacheTime = new HashMap<>();
@@ -188,22 +192,15 @@ public class AttributesManager implements Listener {
         }
         Bases = new HashMap<>();
         Advanceds = new HashMap<>();
-        Logs.Log("Load: " + p.getName() + "'s Lores");
-        List<String> lores = getAllLore(p);
-        Logs.Log("Lores; " + Arrays.toString(lores.toArray()));
         Outter:
         for (String s : getAllLore(p)) {
             s = s.replaceAll("§(.)", "");
-            Logs.Log("\tString: " + s);
             for (String key : Attributes.keySet()) {
-                Logs.Log("\tTest: " + key);
-                if (s.startsWith(key)) {
+                if (s.contains(key)) {
                     Attribute a = Attributes.get(key);
-                    Logs.Log("\tFound: " + s);
                     try {
-                        s = s.contains(":") ? (s.contains(": ") ? s.substring(s.indexOf(": ") + 2) : s.substring(s.indexOf(":") + 1)) : s;
+                        s = s.replaceFirst(key, "");
                         if (a.getAttrType() == AttributeType.Base) {
-                            Logs.Log("\t\tType: " + AttributeType.Base);
                             Attribute.Value v = null;
                             if (Bases.containsKey(a.getName())) {
                                 v = Bases.get(a.getName());
@@ -211,10 +208,8 @@ public class AttributesManager implements Listener {
                                 v = new Attribute.Value<>();
                             }
                             v = a.AnalyzeLore(s, v);
-                            Logs.Log("\t\tValue: " + v);
                             Bases.put(a.getName(), v);
                         } else {
-                            Logs.Log("\t\tType: " + AttributeType.Advanced);
                             List<Attribute.Value> values;
                             if (Advanceds.containsKey(a.getName())) {
                                 values = Advanceds.get(a.getName());
@@ -223,7 +218,6 @@ public class AttributesManager implements Listener {
                             }
                             Attribute.Value v = a.AnalyzeLore(s, new Attribute.Value<>());
                             values.add(v);
-                            Logs.Log("\t\tValue: " + v);
                             Advanceds.put(a.getName(), values);
                         }
                     } catch (Throwable e) {

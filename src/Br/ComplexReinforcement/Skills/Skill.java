@@ -28,10 +28,27 @@ public class Skill<A extends Argments, E extends Event> {
     private final String[] Descriptions;
     private final SkillType<E> Type;
 
+    /**
+     *
+     * @param p 插件主类
+     * @param cls 参数类
+     * @param name 技能名
+     * @param t 技能类型
+     * @param f 技能操作
+     */
     public Skill(Plugin p, Class<A> cls, String name, SkillType<E> t, BiConsumer<A, Player> f) {
         this(p, cls, name, t, f, new String[0]);
     }
 
+    /**
+     *
+     * @param p 插件主类
+     * @param cls 参数类
+     * @param name 技能名
+     * @param t 技能类型
+     * @param f 技能操作
+     * @param des 描述
+     */
     public Skill(Plugin p, Class<A> cls, String name, SkillType<E> t, BiConsumer<A, Player> f, String... des) {
         this.plugin = p;
         this.ArgmentsClass = cls;

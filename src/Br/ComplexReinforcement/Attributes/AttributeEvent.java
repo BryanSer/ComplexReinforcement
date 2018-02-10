@@ -8,11 +8,9 @@ package Br.ComplexReinforcement.Attributes;
 
 import Br.ComplexReinforcement.Logs;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -48,14 +46,52 @@ public final class AttributeEvent extends Event implements Cancellable {
         for (Map.Entry<String, Attribute.Value<? extends Number>> E : map.entrySet()) {
             String key = E.getKey();
             Attribute.Value<? extends Number> value = E.getValue();
-            if(this.Bases.containsKey(key)){
+            if (this.Bases.containsKey(key)) {
                 Attribute.Value<? extends Number> v = Bases.get(key);
                 v.add(value.getValue());
-            }else {
+            } else {
                 Bases.put(key, value);
             }
         }
         return getBases();
+    }
+
+    public void AnalzeLores(List<String> lore) {
+        Outter:
+        for (String s : lore) {
+            s = s.replaceAll("§(.)", "");
+            for (String key : AttributesManager.getKeys()) {
+                if (s.startsWith(key)) {
+                    Attribute a = AttributesManager.getAttribute(key);
+                    try {
+                        s = s.contains(":") ? (s.contains(": ") ? s.substring(s.indexOf(": ") + 2) : s.substring(s.indexOf(":") + 1)) : s;
+                        if (a.getAttrType() == AttributeType.Base) {
+                            Attribute.Value v = null;
+                            if (Bases.containsKey(a.getName())) {
+                                v = Bases.get(a.getName());
+                            } else {
+                                v = new Attribute.Value<>();
+                            }
+                            v = a.AnalyzeLore(s, v);
+                            Bases.put(a.getName(), v);
+                        } else {
+                            List<Attribute.Value> values;
+                            if (Advanceds.containsKey(a.getName())) {
+                                values = Advanceds.get(a.getName());
+                            } else {
+                                values = new ArrayList<>();
+                            }
+                            Attribute.Value v = a.AnalyzeLore(s, new Attribute.Value<>());
+                            values.add(v);
+                            Advanceds.put(a.getName(), values);
+                        }
+                    } catch (Throwable e) {
+                        Logs.Log(e);
+                    }
+                    continue Outter;
+                }
+            }
+        }
     }
 
 //    private void Analze() {

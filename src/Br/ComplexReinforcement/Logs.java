@@ -19,7 +19,7 @@ public class Logs {
     private static PrintWriter PW;
 
     public static void init() {
-        Logs.Log = new Log(Main.Plugin, 30, 30);
+        Logs.Log = new Log(Main.Plugin, 30, 30, true);
         PW = Log.toPrintWriter();
         Logs.Log("Logs >> 初始化 >> 完成");
     }

@@ -12,7 +12,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import org.bukkit.ChatColor;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -38,16 +39,16 @@ public abstract class Argments {
             T t = cls.newInstance();
             t.player = p;
             t.evt = evt;
-            for (Field f : t.getClass().getDeclaredFields()) {
+            System.out.println("r: " + r);
+            for (Field f : getAllField(cls)) {
                 f.setAccessible(true);
-                if (f.isAnnotationPresent(Argment.class)) {
-                    Argment a = f.getAnnotation(Argment.class);
-                    for (String str : s) {
-                        if (str.startsWith(a.Key())) {
-                            str = str.replaceFirst(a.Key() + ":", "");
-                            setValue(f, t, str);
-                            break;
-                        }
+                Argment a = f.getAnnotation(Argment.class);
+                for (String str : s) {
+                    if (str.startsWith(a.Key())) {
+                        str = str.replaceFirst(a.Key() + ":", "");
+                        System.out.println("set " + a.Key() + " " + str);
+                        setValue(f, t, str);
+                        break;
                     }
                 }
             }
@@ -58,38 +59,71 @@ public abstract class Argments {
         return null;
     }
 
+    public static List<Field> getAllField(Class<? extends Argments> cls) {
+        List<Field> result = new ArrayList<>();
+        Class<?> c = cls;
+        while (c != Object.class) {
+            for (Field f : c.getDeclaredFields()) {
+                if (f.isAnnotationPresent(Argment.class)) {
+                    result.add(f);
+                }
+            }
+            c = c.getSuperclass();
+        }
+        return result;
+    }
+
     private static void setValue(Field f, Object obj, String s) throws IllegalArgumentException, IllegalAccessException {
         Class<?> cls = f.getType();
         if (cls == int.class || cls == Integer.class) {
+            s = s.replaceAll("[^0-9.]", "").replaceAll("\\.(.+)", "");
             f.set(obj, Integer.parseInt(s));
         } else if (cls == String.class) {
             f.set(obj, s);
         } else if (cls == float.class || cls == Float.class) {
+            s = s.replaceAll("[^0-9.]", "");
             f.set(obj, Float.parseFloat(s));
         } else if (cls == double.class || cls == Double.class) {
+            s = s.replaceAll("[^0-9.]", "");
             f.set(obj, Double.parseDouble(s));
         } else if (cls == short.class || cls == Short.class) {
+            s = s.replaceAll("[^0-9.]", "").replaceAll("\\.(.+)", "");
             f.set(obj, Short.parseShort(s));
         } else if (cls == char.class || cls == Character.class) {
             f.set(obj, s.charAt(0));
         } else if (cls == byte.class || cls == Byte.class) {
+            s = s.replaceAll("[^0-9.]", "").replaceAll("\\.(.+)", "");
             f.set(obj, Byte.parseByte(s));
         }
     }
-    
-    public <E extends Event> E getEvent(SkillType<E> e){
+
+    public <E extends Event> E getEvent(SkillType<E> e) {
         return (E) this.evt;
     }
 
+    /**
+     * 该玩家是否能够使用此技能
+     *
+     * @return 该玩家是否能够使用此技能
+     */
     public abstract boolean canCast();
 
+    /**
+     * 不能释放的时候显示给玩家的信息
+     *
+     * @return 不能释放的时候显示给玩家的信息
+     */
     public abstract String cantCastMsg();
 
-    public abstract void onCast();
     /**
-     * @return 返回格式化后的技能描述  如果需要在套装中使用的话必须覆盖
+     * 是否技能时调用本方法(无需在这里写技能内容 只需要写和参数有关的操作)
      */
-    public String toString(){
+    public abstract void onCast();
+
+    /**
+     * @return 返回格式化后的技能描述 如果需要在套装中使用的话必须覆盖
+     */
+    public String toString() {
         return super.toString();
     }
 }

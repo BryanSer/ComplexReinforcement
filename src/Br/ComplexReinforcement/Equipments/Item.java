@@ -7,6 +7,7 @@
 package Br.ComplexReinforcement.Equipments;
 
 import Br.API.Data.BrConfigurationSerializable;
+import Br.ComplexReinforcement.Logs;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,13 +30,32 @@ public class Item implements BrConfigurationSerializable {
     @Config
     private short Durability;
     @Config
-    private String DisplayName;
+    private String DisplayName = null;
     @Config
     private List<String> Lore;
     @Config
     private List<String> ItemFlagList;
     private String EquipmentName;
     private ItemFlag[] ItemFlags = new ItemFlag[0];
+
+    public Item(ItemStack is) {
+        if (is == null) {
+            throw new NullPointerException("§c找不到物品");
+        }
+        this.Material = is.getType();
+        this.Durability = is.getDurability();
+        Lore = new ArrayList<>();
+        ItemFlagList = new ArrayList<>();
+        if(is.hasItemMeta()){
+            ItemMeta im = is.getItemMeta();
+            if(im.hasDisplayName()){
+                this.DisplayName = im.getDisplayName();
+            }
+            if(im.hasLore()){
+                Lore.addAll(im.getLore());
+            }
+        }
+    }
 
     public Item(Map<String, Object> args) {
         BrConfigurationSerializable.deserialize(args, this);
@@ -90,20 +110,26 @@ public class Item implements BrConfigurationSerializable {
     }
 
     public ItemStack toItemStack() {
-        ItemStack is = new ItemStack(this.Durability, 1, this.Durability);
-        ItemMeta im = is.getItemMeta();
-        if (this.DisplayName != null) {
-            im.setDisplayName(this.DisplayName);
+        try {
+            ItemStack is = new ItemStack(this.Durability, 1, this.Durability);
+            ItemMeta im = is.getItemMeta();
+            if (this.DisplayName != null) {
+                im.setDisplayName(this.DisplayName);
+            }
+            List<String> lore = new ArrayList<>(this.Lore.size() + 1);
+            lore.add(this.toCode());
+            if (this.Lore != null && !this.Lore.isEmpty()) {
+                lore.addAll(this.Lore);
+            }
+            im.setLore(lore);
+            im.addItemFlags(this.ItemFlags);
+            is.setItemMeta(im);
+            return is;
+        } catch (Throwable t) {
+            Logs.Log("§c这个物品还没有准备好");
+            Logs.Log(t);
+            return null;
         }
-        List<String> lore = new ArrayList<>(this.Lore.size() + 1);
-        lore.add(this.toCode());
-        if (this.Lore != null && !this.Lore.isEmpty()) {
-            lore.addAll(this.Lore);
-        }
-        im.setLore(lore);
-        im.addItemFlags(this.ItemFlags);
-        is.setItemMeta(im);
-        return is;
     }
 
     public boolean isSame(ItemStack is) {

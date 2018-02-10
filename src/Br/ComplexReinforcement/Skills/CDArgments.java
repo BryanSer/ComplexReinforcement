@@ -26,12 +26,13 @@ public abstract class CDArgments extends Argments {
         if (!LastCast.containsKey(this.getClass())) {
             LastCast.put(this.getClass(), new HashMap<>());
         }
-        long get = System.currentTimeMillis() - LastCast.get(this.getClass()).get(super.player.getName());
-        double time = get / 1000d;
-        if (time < this.CD) {
-            return false;
+        Map<String, Long> map = LastCast.get(this.getClass());
+        if (!map.containsKey(super.player.getName())) {
+            return true;
         }
-        return true;
+        long get = System.currentTimeMillis() - map.get(super.player.getName());
+        double time = get / 1000d;
+        return time >= this.CD;
     }
 
     private final static DecimalFormat DF = new DecimalFormat("#.##");
@@ -43,7 +44,7 @@ public abstract class CDArgments extends Argments {
         }
         long get = System.currentTimeMillis() - LastCast.get(this.getClass()).get(super.player.getName());
         double time = get / 1000d;
-        if (time < this.CD) {
+        if (time > this.CD) {
             return "冷却完毕";
         }
         time = this.CD - time;

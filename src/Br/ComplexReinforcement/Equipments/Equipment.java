@@ -24,9 +24,8 @@ import org.bukkit.inventory.ItemStack;
  * @author Bryan_lzh
  */
 public class Equipment {
+
     public static Map<String, Equipment> Equipments = new HashMap<>();
-    
-    
 
     public static void init() {
         File folder = new File(Main.Plugin.getDataFolder(), File.separator + "Equipments" + File.separator);
@@ -46,6 +45,10 @@ public class Equipment {
     private Equipment() {
     }
 
+    private Equipment(String name) {
+        this.Name = name;
+    }
+
     public enum EquipType {
         Helmet(EntityEquipment::getHelmet), Chestplate(EntityEquipment::getChestplate), Leggings(EntityEquipment::getLeggings), Boots(EntityEquipment::getBoots);
         private Function<EntityEquipment, ItemStack> fun = null;
@@ -57,8 +60,24 @@ public class Equipment {
         public Function<EntityEquipment, ItemStack> getFunction() {
             return fun;
         }
+        
+        public static EquipType getEquipType(String s){
+            switch(s){
+                case "0":
+                    return Helmet;
+                case "1":
+                    return Chestplate;
+                case "2":
+                    return Leggings;
+                case "3":
+                    return Boots;
+            }
+            return null;
+        }
 
     }
+    
+    
 
     private Map<EquipType, Item> Items = new EnumMap<>(EquipType.class);
     private String Name;
@@ -68,8 +87,6 @@ public class Equipment {
     public boolean isCompleted() {
         return Completed;
     }
-    
-    
 
     public static Equipment Load(File f) {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
@@ -116,8 +133,21 @@ public class Equipment {
         config.save(f);
     }
 
-    public static Map<String, Equipment> getEquipments() {
+    private static Map<String, Equipment> getEquipments() {
         return Equipments;
+    }
+
+    public static Equipment getEquipment(String s) {
+        return Equipments.get(s);
+    }
+
+    public static Equipment createEquipment(String name) {
+        if (Equipments.containsKey(name)) {
+            return null;
+        }
+        Equipment eq = new Equipment(name);
+        Equipments.put(name, eq);
+        return eq;
     }
 
     public Map<EquipType, Item> getItems() {
