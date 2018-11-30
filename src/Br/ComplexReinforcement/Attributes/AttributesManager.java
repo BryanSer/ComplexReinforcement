@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
@@ -181,6 +183,30 @@ public class AttributesManager implements Listener {
     public static Map<String, Map<String, Attribute.Value<? extends Number>>> BasesCache = new HashMap<>();
     public static Map<String, Map<String, List<Attribute.Value>>> AdvancedsCache = new HashMap<>();
 
+    private static final Pattern REGEX = Pattern.compile("(.*)(?=[: ]+)( ?(?<attr>[^:]+)[: ]+(?!=.*:.*))(?<value>.*)");
+
+    public static String getAttr(Matcher m) {
+        m = m.reset();
+        while (m.find()) {
+            String t = m.group("attr");
+            if (t != null && !t.isEmpty()) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public static String getValue(Matcher m) {
+        m = m.reset();
+        while (m.find()) {
+            String t = m.group("value");
+            if (t != null && !t.isEmpty()) {
+                return t;
+            }
+        }
+        return null;
+    }
+
     private void LoadToMemory(Player p) {
         Map<String, Attribute.Value<? extends Number>> Bases = null;
         Map<String, List<Attribute.Value>> Advanceds = null;
@@ -195,36 +221,36 @@ public class AttributesManager implements Listener {
         Outter:
         for (String s : getAllLore(p)) {
             s = s.replaceAll("§(.)", "");
-            for (String key : Attributes.keySet()) {
-                if (s.contains(key)) {
-                    Attribute a = Attributes.get(key);
-                    try {
-                        s = s.replaceFirst(key, "");
-                        if (a.getAttrType() == AttributeType.Base) {
-                            Attribute.Value v = null;
-                            if (Bases.containsKey(a.getName())) {
-                                v = Bases.get(a.getName());
-                            } else {
-                                v = new Attribute.Value<>();
-                            }
-                            v = a.AnalyzeLore(s, v);
-                            Bases.put(a.getName(), v);
-                        } else {
-                            List<Attribute.Value> values;
-                            if (Advanceds.containsKey(a.getName())) {
-                                values = Advanceds.get(a.getName());
-                            } else {
-                                values = new ArrayList<>();
-                            }
-                            Attribute.Value v = a.AnalyzeLore(s, new Attribute.Value<>());
-                            values.add(v);
-                            Advanceds.put(a.getName(), values);
-                        }
-                    } catch (Throwable e) {
-                        Logs.Log(e);
-                    }
-                    continue Outter;
+            try {
+                Matcher matcher = REGEX.matcher(s);
+                if (!matcher.matches()) {
+                    continue;
                 }
+                String attr = getAttr(matcher);
+                Attribute a = Attributes.get(attr);
+                String value = getValue(matcher);
+                if (a.getAttrType() == AttributeType.Base) {
+                    Attribute.Value v = null;
+                    if (Bases.containsKey(a.getName())) {
+                        v = Bases.get(a.getName());
+                    } else {
+                        v = new Attribute.Value<>();
+                    }
+                    v = a.AnalyzeLore(value, v);
+                    Bases.put(a.getName(), v);
+                } else {
+                    List<Attribute.Value> values;
+                    if (Advanceds.containsKey(a.getName())) {
+                        values = Advanceds.get(a.getName());
+                    } else {
+                        values = new ArrayList<>();
+                    }
+                    Attribute.Value v = a.AnalyzeLore(value, new Attribute.Value<>());
+                    values.add(v);
+                    Advanceds.put(a.getName(), values);
+                }
+            } catch (Throwable e) {
+                Logs.Log(e);
             }
         }
         CacheTime.put(p.getName(), System.currentTimeMillis());

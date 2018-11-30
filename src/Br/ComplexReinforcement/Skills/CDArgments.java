@@ -16,21 +16,17 @@ import java.util.Map;
  */
 public abstract class CDArgments extends Argments {
 
-    private static Map<Class< ? extends CDArgments>, Map<String, Long>> LastCast = new HashMap<>();
+    private Map<String, Long> LastCast = new HashMap<>();
 
     @Argment(Key = "CD")
     private double CD;
 
     @Override
     public final boolean canCast() {
-        if (!LastCast.containsKey(this.getClass())) {
-            LastCast.put(this.getClass(), new HashMap<>());
-        }
-        Map<String, Long> map = LastCast.get(this.getClass());
-        if (!map.containsKey(super.player.getName())) {
+        if (!LastCast.containsKey(super.player.getName())) {
             return true;
         }
-        long get = System.currentTimeMillis() - map.get(super.player.getName());
+        long get = System.currentTimeMillis() - LastCast.get(super.player.getName());
         double time = get / 1000d;
         return time >= this.CD;
     }
@@ -39,10 +35,7 @@ public abstract class CDArgments extends Argments {
 
     @Override
     public final String cantCastMsg() {
-        if (!LastCast.containsKey(this.getClass())) {
-            LastCast.put(this.getClass(), new HashMap<>());
-        }
-        long get = System.currentTimeMillis() - LastCast.get(this.getClass()).get(super.player.getName());
+        long get = System.currentTimeMillis() - LastCast.get(super.player.getName());
         double time = get / 1000d;
         if (time > this.CD) {
             return "冷却完毕";
@@ -53,10 +46,7 @@ public abstract class CDArgments extends Argments {
 
     @Override
     public final void onCast() {
-        if (!LastCast.containsKey(this.getClass())) {
-            LastCast.put(this.getClass(), new HashMap<>());
-        }
-        LastCast.get(this.getClass()).put(super.player.getName(), System.currentTimeMillis());
+        LastCast.put(super.player.getName(), System.currentTimeMillis());
     }
 
 }

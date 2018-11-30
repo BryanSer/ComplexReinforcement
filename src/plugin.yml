@@ -22,7 +22,7 @@ authors: ['Bryan_lzh']
 main: Br.ComplexReinforcement.Main
 description: '开发者QQ:390807154'
 softdepend: [BrAPI]
-version: 1.3
+version: 1.5
 
 commands:
     ComplexReinforcementEquipment:

@@ -14,6 +14,8 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
@@ -108,6 +110,16 @@ public class Equipment {
         }
         eq.Completed = config.getBoolean("Completed");
         return eq;
+    }
+    
+    public static void saveAll(){
+        for (Equipment e : Equipments.values()) {
+            try {
+                e.Save();
+            } catch (IOException ex) {
+                Logger.getLogger(Equipment.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void Save() throws IOException {
